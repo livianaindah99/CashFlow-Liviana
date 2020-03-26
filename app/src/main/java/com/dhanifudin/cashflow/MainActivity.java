@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import com.dhanifudin.cashflow.adapters.TransactionAdapter;
 import com.dhanifudin.cashflow.models.Account;
+import com.dhanifudin.cashflow.models.Session;
 import com.dhanifudin.cashflow.models.Transaction;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements TransactionAdapte
     private RecyclerView transactionsView;
     private TransactionAdapter adapter;
     private Account account;
+    private Session session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,13 @@ public class MainActivity extends AppCompatActivity implements TransactionAdapte
         welcomeText = findViewById(R.id.text_welcome);
         balanceText = findViewById(R.id.text_balance);
         transactionsView = findViewById(R.id.rv_transactions);
+        session = Application.getSession();
+
+        if (!session.isLoggedIn()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -114,16 +123,21 @@ public class MainActivity extends AppCompatActivity implements TransactionAdapte
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
-
+        else if (id == R.id.action_logout) {
+            session.logout();
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
